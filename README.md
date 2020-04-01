@@ -12,7 +12,7 @@ npm i --save-dev vue-phone-mask
 ## Usage
 
 ### Local
-    <NestedInput v-phone-mask="'+7(___)___-__-__'"/>
+    <SomeComponent v-phone-mask="'+7(___)___-__-__'"/>
     ...
     <script>
     import PhoneMask from 'vue-phone-mask';
