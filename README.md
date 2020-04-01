@@ -13,17 +13,21 @@ npm i --save-dev vue-phone-mask
 ## Usage
 
 ### Local
-    <SomeComponent v-phone-mask="'+7(___)___-__-__'"/>
-    ...
-    <script>
-    import PhoneMask from 'vue-phone-mask';
+```javascript
+<SomeComponent v-phone-mask="'+7(___)___-__-__'"/>
+...
+<script>
+import PhoneMask from 'vue-phone-mask';
 
-    ...
-        directives: {
-            'phone-mask': PhoneMask
-        }    
-    </script>
+...
+    directives: {
+        'phone-mask': PhoneMask
+    }    
+</script>
+```
 
 ### Global
-    import PhoneMask from 'vue-phone-mask';
-    Vue.directive('phone-mask', PhoneMask);
+```javascript
+import PhoneMask from 'vue-phone-mask';
+Vue.directive('phone-mask', PhoneMask);
+```
