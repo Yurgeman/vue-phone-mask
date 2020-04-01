@@ -47,6 +47,18 @@ export default class PhoneMask {
     this._masking = this._masking.bind(this);
   }
 
+  hangMask() {
+    this.el.addEventListener('focus', this._showPlaceholder);
+    this.el.addEventListener('focus', this._putCursor);
+    this.el.addEventListener('beforeinput', this._masking);
+    if (this.el.value) {
+      let inputNumber = PhoneMask.removeNaN(this.el.value);
+      this._fillMask(inputNumber);
+      this.el.value = this._mask.join('');
+      this.el.dispatchEvent(new Event('input'));
+    }
+  }
+
   _showPlaceholder() {
     this.el.placeholder = this.mask;
     // if not used in vue
@@ -97,8 +109,7 @@ export default class PhoneMask {
         // nowhere to enter
         return;
       }
-
-      let inputNumber = this._removeNaN(event.data);
+      let inputNumber = PhoneMask.removeNaN(event.data);
       if (inputNumber) {
         args.push(inputNumber);
       } else {
@@ -286,26 +297,13 @@ export default class PhoneMask {
     }
   }
 
-  _removeNaN(string) {
+  static removeNaN(string) {
     return string.replace(/\D+/g, '');
   }
 
-  hangMask() {
-    this.el.addEventListener('focus', this._showPlaceholder);
-    this.el.addEventListener('focus', this._putCursor);
-    this.el.addEventListener('beforeinput', this._masking);
-  }
-
-  static takeOffMask(el) {
-    el.removeEventListener('focus', this._showPlaceholder);
-    el.removeEventListener('focus', this._putCursor);
-    el.removeEventListener('beforeinput', this._masking);
-  }
-
-  enter(string) {
-    let inputNumber = this._removeNaN(string);
-    this._fillMask(inputNumber);
-    this.el.value = this._mask.join('');
-    this.el.dispatchEvent(new Event('input'));
+  takeOffMask() {
+    this.el.removeEventListener('focus', this._showPlaceholder);
+    this.el.removeEventListener('focus', this._putCursor);
+    this.el.removeEventListener('beforeinput', this._masking);
   }
 }

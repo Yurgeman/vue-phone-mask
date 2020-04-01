@@ -8,19 +8,30 @@
   <p>
     <strong>On nested in component input</strong><br>
     <code>NestedInput v-phone-mask="'+7(___)___-__-__'"/</code>
+  
+    <strong>His struct</strong>
+    <pre>
+      div
+        div
+          p
+            label/
+          /p
+          input
+        /div
+      /div
+    </pre>
+    <NestedInput v-phone-mask="'+7(___)___-__-__'"/>
   </p>
-  <strong>His struct</strong>
-  <pre>
-div
-  div
-    p
-      label/
-    /p
-    input
-  /div
-/div
-  </pre>
-  <NestedInput v-phone-mask="'+7(___)___-__-__'"/>
+
+  <p>
+    <strong>When updating the value of the component by the parent,
+      the mask will enter a new value</strong><br>
+    <label>mask '+86(__)____-____':</label>
+    <input
+      v-phone-mask="'+86(__)____-____'"
+      :value="lateNumber"
+    >
+  </p>
 </div>
 </template>
 
@@ -35,6 +46,16 @@ export default {
   },
   directives: {
     'phone-mask': PhoneMask
+  },
+  data() {
+    return {
+      lateNumber: ''
+    };
+  },
+  mounted() {
+    setTimeout(() => {
+      this.lateNumber = '1043239321'
+    }, 1000);
   }
 }
 </script>
