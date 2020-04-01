@@ -27,7 +27,7 @@ import PhoneMask from 'vue-phone-mask';
 ```
 
 ### Global
-```javascript
+```vue
 import PhoneMask from 'vue-phone-mask';
 Vue.directive('phone-mask', PhoneMask);
 ```
