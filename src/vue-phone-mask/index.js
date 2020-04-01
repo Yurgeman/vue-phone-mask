@@ -25,8 +25,11 @@ export default {
     if (binding.value !== el.dataset.phoneMask) {
       let phoneMask = new PhoneMask(el, binding.value);
       phoneMask.hangMask();
-    } else if (el.value &&
-        vnode.data.domProps.value !== oldVnode.data.domProps.value) {
+    } else if (el.value) {
+      let propsObject = oldVnode.data.domProps || oldVnode.data.props;
+      if (el.value === propsObject.value) {
+        return;
+      }
       // update the value using an artificial event
       let beforeInputEvent = new Event('beforeinput');
       // emulation event 'beforeinput'
