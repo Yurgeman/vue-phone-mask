@@ -1,0 +1,10 @@
+<template>
+<div>
+  <div>
+    <p>
+      <label/>
+    </p>
+    <input>
+  </div>
+</div>
+</template>
