@@ -25,21 +25,29 @@ export default {
     if (binding.value !== el.dataset.phoneMask) {
       let phoneMask = new PhoneMask(el, binding.value);
       phoneMask.hangMask();
-    } else if (el.value) {
-      let propsObject = oldVnode.data.domProps || oldVnode.data.props;
-      if (el.value === propsObject.value) {
+      el.dataset.phoneMask = binding.value;
+    } else {
+      let objectProps = vnode.data.domProps ? 'domProps' : 'props';
+      try {
+        if (!vnode.data[objectProps].value || vnode.data[objectProps].value ===
+            oldVnode.data[objectProps].value) {
+          return;
+        }
+      } catch (TypeError) {
         return;
       }
+
       // update the value using an artificial event
       let beforeInputEvent = new Event('beforeinput');
       // emulation event 'beforeinput'
-      beforeInputEvent.data = el.value;
+      beforeInputEvent.data = vnode.data[objectProps].value;
       // the most suitable
       beforeInputEvent.inputType = 'insertFromPaste';
       // if the element has a value that does not match the mask,
       // then it will not work
-      el.value = '';
+      vnode.data[objectProps].value = '';
       el.dispatchEvent(beforeInputEvent);
+      
     }
   }
 }
