@@ -27,12 +27,16 @@ export default {
       phoneMask.hangMask();
     } else if (el.value &&
         vnode.data.domProps.value !== oldVnode.data.domProps.value) {
+      // update the value using an artificial event
+      let beforeInputEvent = new Event('beforeinput');
       // emulation event 'beforeinput'
-      let bi = new Event('beforeinput');
-      bi.inputType = 'insertFromPaste';
-      bi.data = el.value;
+      beforeInputEvent.data = el.value;
+      // the most suitable
+      beforeInputEvent.inputType = 'insertFromPaste';
+      // if the element has a value that does not match the mask,
+      // then it will not work
       el.value = '';
-      el.dispatchEvent(bi);
+      el.dispatchEvent(beforeInputEvent);
     }
   }
 }

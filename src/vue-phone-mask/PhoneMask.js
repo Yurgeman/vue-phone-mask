@@ -80,14 +80,6 @@ export default class PhoneMask {
   }
 
   _masking(event) {
-    /*
-    // historyUndo never appears
-    if (event.inputType !== 'historyUndo') {
-      event.preventDefault();
-    } else {
-      return;
-    }
-    */
     event.preventDefault();
     // select non changed range
     if (this.el.value && (this.el.selectionEnd < this._replaceableChars[0] ||
