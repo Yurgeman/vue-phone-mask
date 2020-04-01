@@ -13,7 +13,7 @@ npm i --save-dev vue-phone-mask
 ## Usage
 
 ### Local
-```javascript
+```vue
 <SomeComponent v-phone-mask="'+7(___)___-__-__'"/>
 ...
 <script>
