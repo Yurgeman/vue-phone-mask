@@ -16,24 +16,22 @@ function checkTag(el) {
 export default {
   bind(el, binding) {
     el = checkTag(el);
-    let phoneMask = new PhoneMask(el, binding.value);
-    phoneMask.hangMask();
-    el.dataset.phoneMask = binding.value;
+    new PhoneMask(el, binding.value);
   },
   componentUpdated(el, binding, vnode, oldVnode) {
     el = checkTag(el);
-    if (binding.value !== el.dataset.phoneMask) {
-      let phoneMask = new PhoneMask(el, binding.value);
-      phoneMask.hangMask();
-      el.dataset.phoneMask = binding.value;
+    if (binding.value !== binding.oldValue) {
+      new PhoneMask(el, binding.value);
     } else {
       let objectProps = vnode.data.domProps ? 'domProps' : 'props';
       try {
+        // if the string is empty or the value has not changed
         if (!vnode.data[objectProps].value || vnode.data[objectProps].value ===
             oldVnode.data[objectProps].value) {
           return;
         }
       } catch (TypeError) {
+        // if there is no value in the component, then skip
         return;
       }
 
@@ -45,9 +43,18 @@ export default {
       beforeInputEvent.inputType = 'insertFromPaste';
       // if the element has a value that does not match the mask,
       // then it will not work
-      vnode.data[objectProps].value = '';
-      el.dispatchEvent(beforeInputEvent);
-      
+      setTimeout(() => {
+        if (el !== document.activeElement) {
+          el.selectionStart = 0;
+          el.selectionEnd = vnode.data[objectProps].value.length;
+        }
+        el.dispatchEvent(beforeInputEvent);
+      });
     }
   }
+  /*
+  unbind(el) {
+    delete masks[el.dataset.idphonemask];
+  }
+  */
 }

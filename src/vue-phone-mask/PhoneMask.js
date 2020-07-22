@@ -1,7 +1,10 @@
 export default class PhoneMask {
   constructor(el, mask) {
     this.el = el;
+    //this.prefix = prefix;
     this.mask = mask;
+    this._unreplacableNumbers = mask.match(/\d/g).join('');
+    //this._mask = Array.from(prefix + mask);
     this._mask = Array.from(mask);
     this._replaceableChars = [];
     this._mask.forEach((char, index) => {
@@ -10,56 +13,65 @@ export default class PhoneMask {
       }
     });
 
-    // change mask
-    this._changeFunction = {
-      insertText: {
-        one: this._insertOneSymbol,
-        many: this._insertOneSymbolInsteadMany
-      },
-      insertFromPaste: {
-        one: this._insertFromPaste,
-        many: this._insertInsteadManySymbolsFromPaste
-      },
-      deleteContentBackward: {
-        one: this._deleteOneSymbolBackward,
-        many: this._deleteManySymbols
-      },
-      deleteContentForward: {
-        one: this._deleteOneSymbolForward,
-        many: this._deleteManySymbols
-      },
-      deleteWordBackward: {
-        one: this._deleteOneWordBackward,
-        many: this._deleteManySymbols
-      },
-      deleteWordForward: {
-        one: this._deleteOneWordForward,
-        many: this._deleteManySymbols
-      },
-      deleteByCut: {
-        // solo mode does not exist
-        many: this._deleteManySymbols
-      }
-    };
-
     this._showPlaceholder = this._showPlaceholder.bind(this);
     this._putCursor = this._putCursor.bind(this);
     this._masking = this._masking.bind(this);
-  }
 
-  hangMask() {
-    this.el.addEventListener('focus', this._showPlaceholder);
+    this.el.addEventListener('focus', this._showPlaceholder, { once: true });
     this.el.addEventListener('focus', this._putCursor);
     this.el.addEventListener('beforeinput', this._masking);
+    
     if (this.el.value) {
-      let inputNumber = PhoneMask.removeNaN(this.el.value);
-      this._fillMask(inputNumber);
-      this.el.value = this._mask.join('');
-      this.el.dispatchEvent(new Event('input'));
+      this.updateValue(this.el.value);
     }
   }
 
+  _changeFunction = {
+    insertText: {
+      one: this._insertOneSymbol,
+      many: this._insertOneSymbolInsteadMany
+    },
+    insertFromPaste: {
+      one: this._insertFromPaste,
+      many: this._insertInsteadManySymbolsFromPaste
+    },
+    deleteContentBackward: {
+      one: this._deleteOneSymbolBackward,
+      many: this._deleteManySymbols
+    },
+    deleteContentForward: {
+      one: this._deleteOneSymbolForward,
+      many: this._deleteManySymbols
+    },
+    deleteWordBackward: {
+      one: this._deleteOneWordBackward,
+      many: this._deleteManySymbols
+    },
+    deleteWordForward: {
+      one: this._deleteOneWordForward,
+      many: this._deleteManySymbols
+    },
+    deleteByCut: {
+      // solo mode does not exist
+      many: this._deleteManySymbols
+    }
+  };
+
+  updateValue(value) {
+    let beforeInputEvent = new Event('beforeinput');
+    beforeInputEvent.data = value;
+    beforeInputEvent.inputType = 'insertFromPaste';
+    setTimeout(() => {
+      if (this.el !== document.activeElement) {
+        this.el.selectionStart = 0;
+        this.el.selectionEnd = value.length;
+      }
+      this.el.dispatchEvent(beforeInputEvent);
+    });
+  }
+
   _showPlaceholder() {
+    //this.el.placeholder = this.prefix + this.mask;
     this.el.placeholder = this.mask;
     // if not used in vue
     // this.el.removeEventListener('focus', this._showPlaceholder);
@@ -74,7 +86,7 @@ export default class PhoneMask {
           this.el.selectionStart = replaceableChar;
           this.el.selectionEnd = replaceableChar;
         });
-        break;
+        return;
       }
     }
   }
@@ -82,42 +94,60 @@ export default class PhoneMask {
   _masking(event) {
     event.preventDefault();
     // select non changed range
-    if (this.el.value && (this.el.selectionEnd < this._replaceableChars[0] ||
+    if (event.isTrusted && this.el.value &&
+        (this.el.selectionEnd < this._replaceableChars[0] ||
         this.el.selectionStart > this._replaceableChars[
           this._replaceableChars.length - 1] + 1)) {
       // it cannot be changed
       return;
     }
+    if (this.el.selectionStart === this._mask.length) {
+      // nowhere to enter
+      return;
+    }
 
-    // instead one or many symbols
-    let selectOneSymbol = this.el.selectionStart === this.el.selectionEnd;
-    let args = [
-      // instead this param, you can simply use this.el.selection* in functions
-      selectOneSymbol ? this.el.selectionEnd :
-        { start: this.el.selectionStart, end: this.el.selectionEnd }
-    ];
+    let inputNumber;
     if (event.data) {
-      if (this.el.selectionStart === this._mask.length) {
-        // nowhere to enter
-        return;
-      }
-      let inputNumber = PhoneMask.removeNaN(event.data);
-      if (inputNumber) {
-        args.push(inputNumber);
-      } else {
-        // "empty" (without number) input, nothing to change
+      inputNumber = removeNaN(event.data);
+      if (!inputNumber) {
+        // "empty" (without numbers) input, nothing to change
         return;
       }
     }
 
-    // change mask and return new selection
-    let selection = selectOneSymbol ?
-      this._changeFunction[event.inputType]['one'].apply(this, args) :
-      this._changeFunction[event.inputType]['many'].apply(this, args);
+    let selection;
+    if (!event.isTrusted) {
+      if (inputNumber.startsWith(this._unreplacableNumbers)) {
+        inputNumber = inputNumber.slice(this._unreplacableNumbers.length);
+      }
+      //this.el.selectionStart
+      selection = this._replaceableChars[this._fillMask(inputNumber)];
+      if (this.el === document.activeElement) {
+        selection = this.el.selectionEnd;
+      }
+    } else {
+      // instead one or many symbols
+      let selectOneSymbol = this.el.selectionStart === this.el.selectionEnd;
+      let args = [
+        // instead this param, you can simply use this.el.selection* in functions
+        selectOneSymbol ? this.el.selectionEnd :
+          { start: this.el.selectionStart, end: this.el.selectionEnd },
+        inputNumber
+      ];
 
+      // change mask and return new selection
+      selection = selectOneSymbol ?
+        this._changeFunction[event.inputType]['one'].apply(this, args) :
+        this._changeFunction[event.inputType]['many'].apply(this, args);
+    }
     this.el.value = this._mask.join('');
     this.el.selectionStart = selection;
     this.el.selectionEnd = selection;
+    /*
+    let inputEvent = new Event('input');
+    inputEvent.data =
+      this._mask.map((char) => char === '_' ? ' ' : char).join('');
+    */
     this.el.dispatchEvent(new Event('input'));
   }
 
@@ -289,13 +319,13 @@ export default class PhoneMask {
     }
   }
 
-  static removeNaN(string) {
-    return string.replace(/\D+/g, '');
-  }
-
   takeOffMask() {
     this.el.removeEventListener('focus', this._showPlaceholder);
     this.el.removeEventListener('focus', this._putCursor);
     this.el.removeEventListener('beforeinput', this._masking);
   }
+}
+
+function removeNaN(string) {
+  return string.replace(/\D+/g, '');
 }

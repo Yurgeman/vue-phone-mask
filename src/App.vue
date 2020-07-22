@@ -7,8 +7,8 @@
   
   <p>
     <strong>On nested in component input</strong><br>
-    <code>NestedInput v-phone-mask="'+7(___)___-__-__'"/</code>
-  
+    <code>NestedInput v-phone-mask="'(___)___-__-__'"/</code>
+    <br>
     <strong>His struct</strong>
     <pre>
       div
@@ -22,16 +22,32 @@
     </pre>
     <NestedInput v-phone-mask="'+7(___)___-__-__'"/>
   </p>
-
   <p>
     <strong>When updating the value of the component by the parent,
       the mask will enter a new value</strong><br>
     <label>mask '+86(__)____-____':</label>
     <input
       v-phone-mask="'+86(__)____-____'"
-      :value="lateNumber"
+      v-model="lateNumber"
     >
+    <span>New number: {{ lateNumber }}</span>
   </p>
+
+  <div>
+    <strong>Additional inputs</strong><br>
+    <label>mask '+1(___)___-___':</label>
+    <br>
+    <div
+      v-for="i in additionalInputs"
+      :key="i"
+    >
+      <input
+        v-phone-mask="'+1(___)___-___'"
+        :value="lateNumber"
+      >
+    </div>
+    <button @click="additionalInputs++">Add input</button>
+  </div>
 </div>
 </template>
 
@@ -49,13 +65,16 @@ export default {
   },
   data() {
     return {
-      lateNumber: ''
+      lateNumber: '1',
+      additionalInputs: 0
     };
   },
   mounted() {
-    setTimeout(() => {
-      this.lateNumber = '1043239321'
-    }, 1000);
+    /*
+    setInterval(() => {
+      this.lateNumber = String(Math.random()).slice(2, 12);
+    }, 2500);
+    */
   }
 }
 </script>
