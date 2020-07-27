@@ -324,6 +324,24 @@ export default class PhoneMask {
     this.el.removeEventListener('focus', this._putCursor);
     this.el.removeEventListener('beforeinput', this._masking);
   }
+
+  static complianceCheck(value, mask) {
+    if (value.length > mask.length) {
+      value = value.slice(0, mask.length);
+    }
+    for (let i = 0; i < value.length; i++) {
+      if (mask[i] === '_') {
+        if (value[i] !== '_' && !/\d/.test(value[i])) {
+          return false;
+        }
+      } else {
+        if (mask[i] !== value[i]) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 }
 
 function removeNaN(string) {

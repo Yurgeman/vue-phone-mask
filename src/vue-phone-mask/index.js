@@ -26,8 +26,10 @@ export default {
       let objectProps = vnode.data.domProps ? 'domProps' : 'props';
       try {
         // if the string is empty or the value has not changed
-        if (!vnode.data[objectProps].value || vnode.data[objectProps].value ===
-            oldVnode.data[objectProps].value) {
+        if (!vnode.data[objectProps].value ||
+            vnode.data[objectProps].value === oldVnode.data[objectProps].value ||
+            (el.value === vnode.data[objectProps].value &&
+              PhoneMask.complianceCheck(el.value, binding.value))) {
           return;
         }
       } catch (TypeError) {
@@ -52,9 +54,4 @@ export default {
       });
     }
   }
-  /*
-  unbind(el) {
-    delete masks[el.dataset.idphonemask];
-  }
-  */
 }
