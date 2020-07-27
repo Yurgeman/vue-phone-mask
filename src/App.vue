@@ -30,6 +30,7 @@
       v-phone-mask="'+86(__)____-____'"
       v-model="lateNumber"
     >
+    <br>
     <span>New number: {{ lateNumber }}</span>
   </p>
 
@@ -70,11 +71,9 @@ export default {
     };
   },
   mounted() {
-    /*
     setInterval(() => {
       this.lateNumber = String(Math.random()).slice(2, 12);
     }, 2500);
-    */
   }
 }
 </script>
