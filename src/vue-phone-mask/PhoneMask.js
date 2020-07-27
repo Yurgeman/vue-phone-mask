@@ -101,7 +101,8 @@ export default class PhoneMask {
       // it cannot be changed
       return;
     }
-    if (this.el.selectionStart === this._mask.length) {
+    if (this.el.selectionStart === this._mask.length &&
+        event.inputType !== 'deleteContentBackward') {
       // nowhere to enter
       return;
     }
@@ -120,7 +121,7 @@ export default class PhoneMask {
       if (inputNumber.startsWith(this._unreplacableNumbers)) {
         inputNumber = inputNumber.slice(this._unreplacableNumbers.length);
       }
-      //this.el.selectionStart
+
       selection = this._replaceableChars[this._fillMask(inputNumber)];
       if (this.el === document.activeElement) {
         selection = this.el.selectionEnd;
@@ -143,11 +144,6 @@ export default class PhoneMask {
     this.el.value = this._mask.join('');
     this.el.selectionStart = selection;
     this.el.selectionEnd = selection;
-    /*
-    let inputEvent = new Event('input');
-    inputEvent.data =
-      this._mask.map((char) => char === '_' ? ' ' : char).join('');
-    */
     this.el.dispatchEvent(new Event('input'));
   }
 
