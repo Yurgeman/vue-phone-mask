@@ -7,7 +7,7 @@
   
   <p>
     <strong>On nested in component input</strong><br>
-    <code>NestedInput v-phone-mask="'(___)___-__-__'"/</code>
+    <code>NestedInput v-phone-mask="'+7(___)___-__-__'"/</code>
     <br>
     <strong>His struct</strong>
     <pre>
