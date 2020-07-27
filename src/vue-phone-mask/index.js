@@ -20,9 +20,7 @@ export default {
   },
   componentUpdated(el, binding, vnode, oldVnode) {
     el = checkTag(el);
-    if (binding.value !== binding.oldValue) {
-      new PhoneMask(el, binding.value);
-    } else {
+    if (binding.value === binding.oldValue) {
       let objectProps = vnode.data.domProps ? 'domProps' : 'props';
       try {
         // if the string is empty or the value has not changed
@@ -52,6 +50,8 @@ export default {
         }
         el.dispatchEvent(beforeInputEvent);
       });
+    } else {
+      new PhoneMask(el, binding.value);
     }
   }
 }
