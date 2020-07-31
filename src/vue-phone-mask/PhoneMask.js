@@ -13,16 +13,17 @@ export default class PhoneMask {
       }
     });
 
-    this._showPlaceholder = this._showPlaceholder.bind(this);
     this._putCursor = this._putCursor.bind(this);
     this._masking = this._masking.bind(this);
 
-    this.el.addEventListener('focus', this._showPlaceholder, { once: true });
     this.el.addEventListener('focus', this._putCursor);
     this.el.addEventListener('beforeinput', this._masking);
-    
     if (this.el.value) {
       this.updateValue(this.el.value);
+    } else {
+      this.el.placeholder = this.mask;
+      this.el.addEventListener('input',
+        () => { this.el.placeholder = ''  }, { once: true });
     }
   }
 
@@ -68,14 +69,6 @@ export default class PhoneMask {
       }
       this.el.dispatchEvent(beforeInputEvent);
     });
-  }
-
-  _showPlaceholder() {
-    //this.el.placeholder = this.prefix + this.mask;
-    this.el.placeholder = this.mask;
-    // if not used in vue
-    // this.el.removeEventListener('focus', this._showPlaceholder);
-    // to show once
   }
 
   _putCursor() {
@@ -340,6 +333,6 @@ export default class PhoneMask {
   }
 }
 
-function removeNaN(string) {
+export function removeNaN(string) {
   return string.replace(/\D+/g, '');
 }

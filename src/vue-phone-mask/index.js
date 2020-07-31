@@ -1,4 +1,5 @@
 import PhoneMask from './PhoneMask';
+export { removeNaN } from './PhoneMask';
 
 function checkTag(el) {
   if (el.tagName !== 'INPUT') {
