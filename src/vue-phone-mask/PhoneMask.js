@@ -16,6 +16,37 @@ export default class PhoneMask {
     this._putCursor = this._putCursor.bind(this);
     this._masking = this._masking.bind(this);
 
+    this._changeFunction = {
+      insertText: {
+        one: this._insertOneSymbol,
+        many: this._insertOneSymbolInsteadMany
+      },
+      insertFromPaste: {
+        one: this._insertFromPaste,
+        many: this._insertInsteadManySymbolsFromPaste
+      },
+      deleteContentBackward: {
+        one: this._deleteOneSymbolBackward,
+        many: this._deleteManySymbols
+      },
+      deleteContentForward: {
+        one: this._deleteOneSymbolForward,
+        many: this._deleteManySymbols
+      },
+      deleteWordBackward: {
+        one: this._deleteOneWordBackward,
+        many: this._deleteManySymbols
+      },
+      deleteWordForward: {
+        one: this._deleteOneWordForward,
+        many: this._deleteManySymbols
+      },
+      deleteByCut: {
+        // solo mode does not exist
+        many: this._deleteManySymbols
+      }
+    };
+
     this.el.addEventListener('focus', this._putCursor);
     this.el.addEventListener('beforeinput', this._masking);
     if (this.el.value) {
@@ -26,37 +57,6 @@ export default class PhoneMask {
         () => { this.el.placeholder = ''  }, { once: true });
     }
   }
-
-  _changeFunction = {
-    insertText: {
-      one: this._insertOneSymbol,
-      many: this._insertOneSymbolInsteadMany
-    },
-    insertFromPaste: {
-      one: this._insertFromPaste,
-      many: this._insertInsteadManySymbolsFromPaste
-    },
-    deleteContentBackward: {
-      one: this._deleteOneSymbolBackward,
-      many: this._deleteManySymbols
-    },
-    deleteContentForward: {
-      one: this._deleteOneSymbolForward,
-      many: this._deleteManySymbols
-    },
-    deleteWordBackward: {
-      one: this._deleteOneWordBackward,
-      many: this._deleteManySymbols
-    },
-    deleteWordForward: {
-      one: this._deleteOneWordForward,
-      many: this._deleteManySymbols
-    },
-    deleteByCut: {
-      // solo mode does not exist
-      many: this._deleteManySymbols
-    }
-  };
 
   updateValue(value) {
     let beforeInputEvent = new Event('beforeinput');
